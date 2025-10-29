@@ -1,4 +1,4 @@
-package com.dumenciler.scmsystem;
+package com.dumenciler.starter;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
