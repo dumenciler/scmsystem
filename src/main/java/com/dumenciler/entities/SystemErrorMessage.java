@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "system_error_messages")
+@Table(name = "system_error_messages", schema = "public")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,63 +1,36 @@
 // app/actions.js
-"use server"; // Bu bir Sunucu Eylemidir!
 
-export async function handleRegister(formData) {
-    
-    // BURAYI GÜNCELLE: Kendi Spring Boot API adresinizi yazın
-    const API_URL = 'http://localhost:8080/api/auth/register'; 
+const API_BASE =
+  (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080").replace(/\/+$/, "");
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            // Formdan gelen 'firstName', 'lastName' vb. veriyi JSON'a çeviriyoruz
-            body: JSON.stringify(formData), 
-        });
+export async function handleRegister({ firstName, lastName, username, password }) {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/user/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName, lastName, username, password }),
+    });
+    const data = await res.json().catch(() => ({}));
 
-        // Backend'den gelen yanıtı JSON olarak oku
-        const data = await response.json();
-
-        if (!response.ok) {
-            // Eğer backend 400, 500 gibi bir hata döndürürse
-            // (örn: "Bu email zaten kullanılıyor")
-            return { success: false, message: data.message || 'Hata oluştu' };
-        }
-
-        // Başarılı
-        return { success: true, data: data };
-
-    } catch (error) {
-        // fetch hatası veya sunucuya ulaşılamaması durumu
-        console.error('Register hatası:', error);
-        return { success: false, message: 'Sunucuya bağlanılamadı.' };
-    }
+    const ok = res.ok && (data?.id || /success/i.test(String(data?.message || "")));
+    return { success: !!ok, message: data?.message || (ok ? "OK" : "Kayıt başarısız"), data };
+  } catch {
+    return { success: false, message: "Sunucuya bağlanılamadı." };
+  }
 }
 
-// ----- LOGIN İŞLEMİ (BONUS) -----
-// Login için de benzer bir fonksiyon oluşturabilirsiniz
-export async function handleLogin(formData) {
-    // BURAYI GÜNCELLE: Kendi login API adresinizi yazın
-    const API_URL = 'http://localhost:8080/api/auth/login'; 
+export async function handleLogin({ username, password }) {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/user/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json().catch(() => ({}));
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData), // { email, password }
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            return { success: false, message: data.message || 'Giriş başarısız' };
-        }
-
-        // Genellikle backend bir "token" döner, bunu burada işleyebilirsiniz
-        return { success: true, data: data }; 
-
-    } catch (error) {
-        return { success: false, message: 'Sunucuya bağlanılamadı.' };
-    }
+    const ok = res.ok && (data?.id || /success/i.test(String(data?.message || "")));
+    return { success: !!ok, message: data?.message || (ok ? "OK" : "Giriş başarısız"), data };
+  } catch {
+    return { success: false, message: "Sunucuya bağlanılamadı." };
+  }
 }

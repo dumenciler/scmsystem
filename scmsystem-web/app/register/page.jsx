@@ -1,8 +1,8 @@
 // app/register/page.jsx
-"use client"; // Bu satır önemli!
+"use client"; 
 
 import { useState } from 'react';
-import { handleRegister } from '../actions'; // Bunu bir sonraki adımda oluşturacağız
+import { handleRegister } from '../actions'; 
 import { useRouter } from 'next/navigation';
 
 import { Button } from "@/components/ui/button";
@@ -18,30 +18,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function RegisterPage() {
-    // Form verilerini tutmak için state'ler
+    
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     
-    const router = useRouter(); // Yönlendirme için
+    const router = useRouter(); 
 
-    // Form gönderildiğinde bu fonksiyon çalışacak
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null); // Eski hataları temizle
+        setError(null); 
 
         try {
-            // Sunucu Eylemimizi (Server Action) çağırıyoruz
+            
             const result = await handleRegister({ firstName, lastName, username, password });
 
             if (result.success) {
-                // Kayıt başarılı, login sayfasına yönlendir
+                
                 alert('Kayıt başarılı! Lütfen giriş yapın.');
                 router.push('/login');
             } else {
-                // Backend'den gelen hatayı göster
+                
                 setError(result.message || 'Kayıt başarısız oldu.');
             }
         } catch (err) {
@@ -96,7 +96,7 @@ export default function RegisterPage() {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="username">Password</Label>
+                            <Label htmlFor="password">Password</Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -121,7 +121,7 @@ export default function RegisterPage() {
                     
                     {error && <p style={{ color: 'red' }}>{error}</p>}
                     
-                    <button type="submit">Kayıt Ol</button>
+                    
                 </form>
             </Card>
         </div>
