@@ -20,6 +20,8 @@ import com.dumenciler.dto.DtoUser;
 import com.dumenciler.dto.DtoUserIU;
 import com.dumenciler.services.IUserService;
 
+@CrossOrigin(origins = "http://localhost:3000") 
+
 @RestController
 @RequestMapping("/rest/api/user")
 public class UserControllerImpl implements IUserController{
