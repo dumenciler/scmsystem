@@ -1,0 +1,79 @@
+Mimari Özeti (Sprint 0)
+
+Bu dokümanda, "Üniversite Öğrenci Kulübü Uygulaması" projesinin Sprint 0 hedefi  için yaptığımız teknik mimariyi ve veri akışını anlattık.
+
+
+1. Seçilen Teknoloji Yığını 
+
+Backend: Spring Boot 
+
+Frontend: Next.js 
+
+Veritabanı: PostgreSQL
+
+UI/Stil: Tailwind CSS & shadcn/ui
+
+2. Mimari Yapı ve Veri Akışı (DB→API→UI) 
+
+Proje, frontend (Next.js) ve  backend (Spring Boot) klasörlerinden oluşan monorepo benzeri bir yapıda kurulmuştur.
+
+-Backend Mimarisi: Backend, Spring Boot kullanılarak 3 katmanlı mimariye (Controller, Service, Repository)  uygun olarak tasarlanmıştır:
+
+Controller Katmanı: Dışarıdan gelen HTTP isteklerini (örn: POST /api/auth/login) karşılar, JSON verisini alır ve Service katmanına yönlendirir.
+
+Service Katmanı: İş mantığını (örn: şifre doğrulama, kullanıcı oluşturma) yürütür.
+
+Repository Katmanı: Veritabanı işlemleri (CRUD) için Service katmanından gelen talepleri işler.
+
+-Frontend Mimarisi: Frontend, Next.js kullanır. app dizini altında sayfa bazlı yönlendirme (/login, /register) kullanılır. Backend ile iletişim modern bir yaklaşımla app/actions.js dosyası içinde tanımlanan Server Actions aracılığıyla kurulur.
+
+
+3. Kullanılan API Endpoint'leri ve Örnek JSON 
+
+Sprint 0 Ana Görevi (Sistem Mesajı) 
+
+Endpoint: GET /api/system-message 
+
+Açıklama: Veritabanındaki aktif sistem duyurusunu  getirir.
+
+
+Örnek JSON Yanıtı (Başarılı):
+
+JSON
+{
+  "id": 1,
+  "messageText": "Çok yakında hizmetinizdeyiz"
+}
+Ek Geliştirme (Kullanıcı Doğrulama)
+
+Endpoint: POST /api/auth/register
+
+Açıklama: Yeni kullanıcı kaydı oluşturur.
+
+Örnek JSON İsteği (Request):
+
+JSON
+{
+  "firstName": "Arda",
+  "lastName": "Gönüllü",
+  "email": "user@example.com",
+  "password": "..."
+}
+Endpoint: POST /api/auth/login
+
+Açıklama: Kullanıcı girişi yapar.
+
+Örnek JSON İsteği (Request):
+
+JSON
+{
+  "email": "user@example.com",
+  "password": "..."
+}
+Örnek JSON Yanıtı (Başarılı):
+
+JSON
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiJ9..."
+}
