@@ -19,7 +19,7 @@ Proje, frontend (Next.js) ve  backend (Spring Boot) klasörlerinden oluşan mono
 
 -Backend Mimarisi: Backend, Spring Boot kullanılarak 3 katmanlı mimariye (Controller, Service, Repository)  uygun olarak tasarlanmıştır:
 
-Controller Katmanı: Dışarıdan gelen HTTP isteklerini (örn: POST /api/auth/login) karşılar, JSON verisini alır ve Service katmanına yönlendirir.
+Controller Katmanı: Dışarıdan gelen HTTP isteklerini (örn: POST rest/api/user/login) karşılar, JSON verisini alır ve Service katmanına yönlendirir.
 
 Service Katmanı: İş mantığını (örn: şifre doğrulama, kullanıcı oluşturma) yürütür.
 
@@ -32,7 +32,7 @@ Repository Katmanı: Veritabanı işlemleri (CRUD) için Service katmanından ge
 
 Sprint 0 Ana Görevi (Sistem Mesajı) 
 
-Endpoint: GET /api/system-message 
+Endpoint: GET rest/api/user/system-message 
 
 Açıklama: Veritabanındaki aktif sistem duyurusunu  getirir.
 
@@ -46,7 +46,7 @@ JSON
 }
 Ek Geliştirme (Kullanıcı Doğrulama)
 
-Endpoint: POST /api/auth/register
+Endpoint: POST rest/api/user/register
 
 Açıklama: Yeni kullanıcı kaydı oluşturur.
 
@@ -59,7 +59,7 @@ JSON
   "email": "user@example.com",
   "password": "..."
 }
-Endpoint: POST /api/auth/login
+Endpoint: POST rest/api/user/login
 
 Açıklama: Kullanıcı girişi yapar.
 
