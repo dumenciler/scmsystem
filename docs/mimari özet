@@ -1,25 +1,23 @@
 Mimari Özeti (Sprint 0)
 
-Bu doküman, "Üniversite Öğrenci Kulübü Uygulaması" projesinin Sprint 0 hedefi  için oluşturulan teknik mimariyi ve veri akışını özetler.
+Bu dokümanda, "Üniversite Öğrenci Kulübü Uygulaması" projesinin Sprint 0 hedefi  için yaptığımız teknik mimariyi ve veri akışını anlattık.
 
 
 1. Seçilen Teknoloji Yığını 
 
-Backend: Spring Boot (Java)
+Backend: Spring Boot 
 
-Frontend: Next.js 14+ (App Router)
+Frontend: Next.js 
 
-Veritabanı: [Buraya veritabanınızı yazın, örn: PostgreSQL, H2, MySQL]
+Veritabanı: PostgreSQL
 
 UI/Stil: Tailwind CSS & shadcn/ui
 
 2. Mimari Yapı ve Veri Akışı (DB→API→UI) 
 
-Proje, frontend (Next.js), backend (Spring Boot) ve docs klasörlerinden oluşan monorepo benzeri bir yapıda kurulmuştur.
+Proje, frontend (Next.js) ve  backend (Spring Boot) klasörlerinden oluşan monorepo benzeri bir yapıda kurulmuştur.
 
-Backend Mimarisi
-
-Backend, Spring Boot kullanılarak 3 katmanlı mimariye (Controller, Service, Repository)  uygun olarak tasarlanmıştır:
+-Backend Mimarisi: Backend, Spring Boot kullanılarak 3 katmanlı mimariye (Controller, Service, Repository)  uygun olarak tasarlanmıştır:
 
 Controller Katmanı: Dışarıdan gelen HTTP isteklerini (örn: POST /api/auth/login) karşılar, JSON verisini alır ve Service katmanına yönlendirir.
 
@@ -27,23 +25,8 @@ Service Katmanı: İş mantığını (örn: şifre doğrulama, kullanıcı oluş
 
 Repository Katmanı: Veritabanı işlemleri (CRUD) için Service katmanından gelen talepleri işler.
 
-Frontend Mimarisi
+-Frontend Mimarisi: Frontend, Next.js kullanır. app dizini altında sayfa bazlı yönlendirme (/login, /register) kullanılır. Backend ile iletişim modern bir yaklaşımla app/actions.js dosyası içinde tanımlanan Server Actions aracılığıyla kurulur.
 
-Frontend, Next.js (App Router) kullanır. app dizini altında sayfa bazlı yönlendirme (/login, /register) kullanılır. Backend ile iletişim, "en az araçla" ve modern bir yaklaşımla, app/actions.js dosyası içinde tanımlanan Server Actions (Sunucu Eylemleri) aracılığıyla kurulur.
-
-Uçtan Uca Veri Akışı (Örnek: Login)
-
-UI (Next.js): Kullanıcı app/login/page.jsx üzerindeki "Giriş Yap" butonuna tıklar.
-
-Frontend (Server Action): app/actions.js içindeki handleLogin fonksiyonu tetiklenir.
-
-API (Spring Boot): handleLogin fonksiyonu, fetch kullanarak http://localhost:8080/api/auth/login adresindeki Backend API'sine bir POST isteği atar.
-
-Backend (Spring): İstek, Controller → Service → Repository katmanlarından geçerek veritabanında doğrulanır.
-
-API (Spring Boot): Backend, başarılı (veya hatalı) bir JSON yanıtı döndürür.
-
-UI (Next.js): handleLogin fonksiyonu yanıtı alır ve başarılıysa kullanıcıyı router.push('/home') komutuyla ana sayfaya yönlendirir.
 
 3. Kullanılan API Endpoint'leri ve Örnek JSON 
 
