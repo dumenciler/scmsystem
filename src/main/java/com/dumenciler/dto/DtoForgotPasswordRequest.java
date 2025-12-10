@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class DtoLoginRequest {
+public class DtoForgotPasswordRequest {
     private String email;
-    private String password;
 }

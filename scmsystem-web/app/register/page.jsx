@@ -6,25 +6,26 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { School, User, Lock, UserPlus, Loader2 } from "lucide-react";
+import { School, User, Lock, UserPlus, Loader2, Mail } from "lucide-react";
 
 export default function RegisterPage() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    
-    const router = useRouter(); 
+
+    const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null); 
+        setError(null);
         setLoading(true);
 
         try {
-            const result = await handleRegister({ firstName, lastName, username, password });
+            const result = await handleRegister({ firstName, lastName, email, username, password });
             if (result.success) {
                 alert('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.');
                 router.push('/login');
@@ -41,7 +42,7 @@ export default function RegisterPage() {
     return (
         <main className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
             <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8 space-y-6">
-                
+
                 <div className="text-center space-y-2">
                     <div className="mx-auto bg-blue-50 dark:bg-blue-900/20 w-16 h-16 rounded-full flex items-center justify-center mb-4 ring-8 ring-blue-50/50 dark:ring-blue-900/10">
                         <School className="w-8 h-8 text-blue-900 dark:text-blue-400" />
@@ -54,22 +55,37 @@ export default function RegisterPage() {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="firstName">Ad</Label>
-                            <Input 
-                                id="firstName" 
+                            <Input
+                                id="firstName"
                                 className="h-11 bg-zinc-50/50"
-                                value={firstName} 
-                                onChange={(e) => setFirstName(e.target.value)} 
-                                required 
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="lastName">Soyad</Label>
-                            <Input 
-                                id="lastName" 
+                            <Input
+                                id="lastName"
                                 className="h-11 bg-zinc-50/50"
-                                value={lastName} 
-                                onChange={(e) => setLastName(e.target.value)} 
-                                required 
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="email">E-posta</Label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
+                            <Input
+                                id="email"
+                                type="email"
+                                className="pl-10 h-11 bg-zinc-50/50"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
                             />
                         </div>
                     </div>
@@ -78,12 +94,12 @@ export default function RegisterPage() {
                         <Label htmlFor="username">Kullanıcı Adı</Label>
                         <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
-                            <Input 
-                                id="username" 
+                            <Input
+                                id="username"
                                 className="pl-10 h-11 bg-zinc-50/50"
-                                value={username} 
-                                onChange={(e) => setUsername(e.target.value)} 
-                                required 
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
                             />
                         </div>
                     </div>
@@ -92,13 +108,13 @@ export default function RegisterPage() {
                         <Label htmlFor="password">Şifre</Label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
-                            <Input 
-                                id="password" 
-                                type="password" 
+                            <Input
+                                id="password"
+                                type="password"
                                 className="pl-10 h-11 bg-zinc-50/50"
-                                value={password} 
-                                onChange={(e) => setPassword(e.target.value)} 
-                                required 
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
                             />
                         </div>
                     </div>

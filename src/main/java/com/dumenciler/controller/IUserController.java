@@ -6,15 +6,17 @@ import com.dumenciler.dto.DtoUser;
 import com.dumenciler.dto.DtoUserIU;
 
 public interface IUserController {
-	
-public DtoUser saveUser(DtoUserIU dtoUserIU);
-	
+
+	public DtoUser saveUser(DtoUserIU dtoUserIU);
+
 	public List<DtoUser> getAllUser();
-	
+
 	public DtoUser getUserById(Integer id);
-	
+
 	public void deleteUser(Integer id);
-	
+
 	public DtoUser updateUser(Integer id, DtoUserIU dtoUserIU);
-	
+
+	// Note: Login and Register are directly in Controller implementation usually,
+	// but good practice to have here if standard
 }

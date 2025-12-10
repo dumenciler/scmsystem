@@ -9,8 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class DtoLoginRequest {
-    private String email;
-    private String password;
+public class DtoClub {
+    private Integer id;
+    private String name;
+    private String description;
+    private String logoLink;
 }

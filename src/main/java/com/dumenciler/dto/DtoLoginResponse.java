@@ -11,8 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 
 public class DtoLoginResponse {
-	private Integer id;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String message;
+    private com.dumenciler.entities.Role role;
 }
