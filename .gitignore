@@ -1,0 +1,52 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### next ###
+scmsystem-web/node_modules/
+
+# Next.js klasöründekileri görmezden gel
+scmsystem-web/node_modules/
+scmsystem-web/.next/
+node_modules/
+
+# Ana klasörde oluşabilecek gereksiz dosyalar
+/node_modules/
+/package-lock.json
+/package.json
+/.DS_Store
+
+# Web projesinin içindekiler
+/scmsystem-web/node_modules/
+/scmsystem-web/.next/
+/scmsystem-web/out/
