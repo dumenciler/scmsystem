@@ -50,3 +50,10 @@ node_modules/
 /scmsystem-web/node_modules/
 /scmsystem-web/.next/
 /scmsystem-web/out/
+
+# Docker
+.docker/
+postgres_data/
+
+# Logs
+*.log
