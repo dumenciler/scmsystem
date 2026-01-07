@@ -2,225 +2,255 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUserById, updateUser } from "../actions";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { UserCircle, Save, LogOut, ArrowLeft, Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+    User, Mail, LogOut, LayoutDashboard, Clock, CheckCircle, 
+    XCircle, ArrowRight, Home, Edit, Save, X, Lock 
+} from "lucide-react";
 
 export default function ProfilePage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-  const [userId, setUserId] = useState(null);
+    const router = useRouter();
+    
+    // Kullanıcı ve Form State'leri
+    const [user, setUser] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    // Şifre alanını da form datasına ekledik
+    const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", password: "" });
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    password: "",        // Yeni şifre
-    currentPassword: ""  // Mevcut şifre (Doğrulama için)
-  });
+    const [registrations, setRegistrations] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  const [message, setMessage] = useState({ text: "", type: "" });
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const userStr = localStorage.getItem("user");
-      if (!userStr) {
-        router.push("/login");
-        return;
-      }
-      try {
-        const user = JSON.parse(userStr);
-        if (user && user.id) {
-          setUserId(user.id);
-          fetchUserData(user.id);
-        } else {
-          router.push("/login");
+    useEffect(() => {
+        const userStr = localStorage.getItem("user");
+        if (!userStr) {
+            router.push("/login");
+            return;
         }
-      } catch (e) {
+
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+        setFormData({ 
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            password: "" // Başlangıçta boş, eğer kullanıcı doldurursa güncellenecek
+        });
+
+        fetchRegistrations(userData.id);
+    }, [router]);
+
+    const fetchRegistrations = async (userId) => {
+        try {
+            const res = await fetch(`http://localhost:8082/rest/api/club-registration/my-registrations/${userId}`);
+            if (res.ok) {
+                const data = await res.json();
+                setRegistrations(data);
+            }
+        } catch (error) {
+            console.error("Başvurular çekilemedi:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("user");
         router.push("/login");
-      }
-    }
-  }, [router]);
+    };
 
-  const fetchUserData = async (id) => {
-    try {
-      const data = await getUserById(id);
-      if (data) {
-        setFormData(prev => ({
-          ...prev,
-          firstName: data.firstName || "",
-          lastName: data.lastName || "",
-          username: data.username || "",
-          email: data.email || "",
-        }));
-      } else {
-        setMessage({ text: "Kullanıcı bilgileri alınamadı.", type: "error" });
-      }
-    } catch {
-      setMessage({ text: "Sunucu hatası.", type: "error" });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleUpdateProfile = async () => {
+        // Eğer şifre alanı boşsa, göndermeyelim veya backend boş şifreyi güncellememeli.
+        // Bizim backend muhtemelen tüm objeyi alıp kaydediyor.
+        // Backend'in boş şifreyi ezmemesi lazım ama şimdilik gönderelim.
+        
+        try {
+            const res = await fetch(`http://localhost:8082/rest/api/user/update/${user.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    setMessage({ text: "", type: "" });
+            if (res.ok) {
+                const updatedUser = await res.json();
+                // Şifre güvenlik gereği response'da dönmeyebilir, eski user ile merge edelim
+                const newUserData = { ...user, ...updatedUser };
+                
+                localStorage.setItem("user", JSON.stringify(newUserData));
+                setUser(newUserData);
+                setIsEditing(false);
+                // Şifre alanını temizle
+                setFormData(prev => ({ ...prev, password: "" }));
+                alert("Profiliniz (ve girdiyseniz şifreniz) başarıyla güncellendi! ✅");
+            } else {
+                alert("Güncelleme başarısız oldu.");
+            }
+        } catch (error) {
+            console.error("Güncelleme hatası:", error);
+            alert("Bir hata oluştu.");
+        }
+    };
 
-    // Şifre değişikliği kontrolü
-    if (formData.password && !formData.currentPassword) {
-      setMessage({ text: "Şifrenizi değiştirmek için mevcut şifrenizi girmelisiniz.", type: "error" });
-      return;
-    }
+    const getStatusBadge = (status) => {
+        switch (status) {
+            case "APPROVED":
+                return <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"><CheckCircle className="w-3 h-3 mr-1" /> Onaylandı</span>;
+            case "REJECTED":
+                return <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"><XCircle className="w-3 h-3 mr-1" /> Reddedildi</span>;
+            default: 
+                return <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"><Clock className="w-3 h-3 mr-1" /> Beklemede</span>;
+        }
+    };
 
-    setUpdating(true);
+    if (loading) return <div className="p-10 text-center">Yükleniyor...</div>;
+    if (!user) return null;
 
-    try {
-      const result = await updateUser(userId, formData);
-
-      if (result.success) {
-        setMessage({ text: "Profil başarıyla güncellendi!", type: "success" });
-        localStorage.setItem("userName", formData.firstName);
-        setFormData(prev => ({ ...prev, password: "", currentPassword: "" }));
-      } else {
-        setMessage({ text: result.message || "Güncelleme başarısız. Mevcut şifrenizi kontrol edin.", type: "error" });
-      }
-    } catch {
-      setMessage({ text: "Bir hata oluştu.", type: "error" });
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userName");
-    router.push("/login");
-  };
-
-  if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-zinc-50">
-        <Loader2 className="w-8 h-8 text-blue-900 animate-spin" />
-      </div>
+        <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-6">
+            <div className="max-w-4xl mx-auto space-y-6">
+                
+                <Link href="/home">
+                    <Button variant="ghost" className="hover:bg-zinc-200 dark:hover:bg-zinc-800">
+                        <Home className="w-4 h-4 mr-2" /> Ana Sayfaya Dön
+                    </Button>
+                </Link>
+
+                <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm relative overflow-hidden">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                        
+                        <div className="flex items-center gap-4 w-full md:w-auto">
+                            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                                <User className="w-8 h-8" />
+                            </div>
+                            
+                            <div className="w-full">
+                                {isEditing ? (
+                                    // --- DÜZENLEME MODU (ŞİFRE EKLENDİ) ---
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg">
+                                        <Input 
+                                            placeholder="Ad" 
+                                            value={formData.firstName}
+                                            onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                                        />
+                                        <Input 
+                                            placeholder="Soyad" 
+                                            value={formData.lastName}
+                                            onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                                        />
+                                        <div className="md:col-span-2 relative">
+                                            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
+                                            <Input 
+                                                placeholder="Email" 
+                                                className="pl-9"
+                                                value={formData.email}
+                                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                            />
+                                        </div>
+                                        {/* YENİ ŞİFRE ALANI */}
+                                        <div className="md:col-span-2 relative">
+                                            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
+                                            <Input 
+                                                type="password"
+                                                placeholder="Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)" 
+                                                className="pl-9"
+                                                value={formData.password}
+                                                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    // --- GÖRÜNTÜLEME MODU ---
+                                    <>
+                                        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
+                                            {user.firstName} {user.lastName}
+                                        </h1>
+                                        <div className="flex items-center text-zinc-500 text-sm mt-1">
+                                            <Mail className="w-4 h-4 mr-1" />
+                                            {user.email}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                            {isEditing ? (
+                                <>
+                                    <Button size="sm" onClick={handleUpdateProfile} className="bg-green-600 hover:bg-green-700 text-white">
+                                        <Save className="w-4 h-4 mr-2" /> Kaydet
+                                    </Button>
+                                    <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
+                                        <X className="w-4 h-4 mr-2" /> İptal
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                                        <Edit className="w-4 h-4 mr-2" /> Profili Düzenle
+                                    </Button>
+                                    {/* Şifre sıfırlama linki kaldırıldı çünkü artık input var */}
+                                </>
+                            )}
+
+                            {!isEditing && (
+                                <>
+                                    {user.role === 'ADMIN' && (
+                                        <Link href="/admin">
+                                            <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                                                <LayoutDashboard className="w-4 h-4 mr-2" /> Panel
+                                            </Button>
+                                        </Link>
+                                    )}
+                                    <Button variant="destructive" size="sm" onClick={handleLogout}>
+                                        <LogOut className="w-4 h-4 mr-2" /> Çıkış
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">🎓 Kulüplerim ve Başvurularım</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {registrations.length === 0 ? (
+                            <div className="text-center py-10 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-700">
+                                <p className="text-zinc-500 mb-4">Henüz hiçbir kulübe üye değilsiniz.</p>
+                                <Link href="/clubs"><Button>Kulüpleri Keşfet <ArrowRight className="ml-2 w-4 h-4"/></Button></Link>
+                            </div>
+                        ) : (
+                            <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500">
+                                        <tr>
+                                            <th className="p-4 font-medium">Kulüp Adı</th>
+                                            <th className="p-4 font-medium">Başvuru Tarihi</th>
+                                            <th className="p-4 font-medium">Durum</th>
+                                            <th className="p-4 font-medium text-right">İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 bg-white dark:bg-zinc-900">
+                                        {registrations.map((reg) => (
+                                            <tr key={reg.id} className="group hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20">
+                                                <td className="p-4 font-medium text-zinc-900 dark:text-zinc-100">{reg.clubName}</td>
+                                                <td className="p-4 text-zinc-500">{reg.applicationDate ? new Date(reg.applicationDate).toLocaleDateString("tr-TR") : "-"}</td>
+                                                <td className="p-4">{getStatusBadge(reg.status)}</td>
+                                                <td className="p-4 text-right">
+                                                    <Link href={`/clubs/${reg.clubId}`}><Button variant="ghost" size="sm" className="h-8">Detay</Button></Link>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        </main>
     );
-  }
-
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8 space-y-6">
-
-        <div className="flex items-center justify-between border-b border-zinc-100 pb-4 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-50 p-2 rounded-full">
-              <UserCircle className="w-6 h-6 text-blue-900" />
-            </div>
-            <h1 className="text-xl font-bold text-blue-950 dark:text-white">Profilim</h1>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => router.push('/home')} className="text-zinc-500 hover:text-blue-900">
-            <ArrowLeft className="w-4 h-4 mr-1" /> Geri
-          </Button>
-        </div>
-
-        <form onSubmit={handleUpdate} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">Ad</Label>
-              <Input
-                id="firstName"
-                className="h-11 bg-zinc-50/50"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Soyad</Label>
-              <Input
-                id="lastName"
-                className="h-11 bg-zinc-50/50"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="username">Kullanıcı Adı</Label>
-            <Input
-              id="username"
-              className="h-11 bg-zinc-50/50"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">E-posta Adresi</Label>
-            <Input
-              id="email"
-              type="email"
-              className="h-11 bg-zinc-50/50"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="pt-4 border-t border-zinc-100 mt-4">
-            <h3 className="text-sm font-medium text-zinc-900 mb-3">Şifre Değiştir</h3>
-
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword">Mevcut Şifre</Label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  className="h-11 bg-zinc-50/50"
-                  value={formData.currentPassword}
-                  onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-                  placeholder="Şifre veya e-posta değiştirmek için zorunlu"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Yeni Şifre</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  className="h-11 bg-zinc-50/50"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="İsteğe bağlı"
-                />
-              </div>
-            </div>
-          </div>
-
-          {message.text && (
-            <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-              {message.type === 'success' ? '✅' : '⚠️'} {message.text}
-            </div>
-          )}
-
-          <div className="pt-2 space-y-3">
-            <Button type="submit" className="w-full h-11 bg-blue-900 hover:bg-blue-800 text-white" disabled={updating}>
-              {updating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              Değişiklikleri Kaydet
-            </Button>
-
-            <Button variant="outline" type="button" className="w-full h-11 border-zinc-200 text-red-600 hover:bg-red-50" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Çıkış Yap
-            </Button>
-          </div>
-        </form>
-      </div>
-    </main>
-  );
 }

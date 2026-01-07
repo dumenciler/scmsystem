@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Users, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -34,14 +35,16 @@ export function ClubCard({ club }) {
             </p>
 
             <div className="mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                <Button
-                    variant="outline"
-                    className="w-full text-xs h-9"
-                    onClick={() => { }} // Future: Go to club details
-                >
-                    <ExternalLink className="w-3 h-3 mr-2" />
-                    Detaylar
-                </Button>
+                {/* BURASI DÜZELTİLDİ: Artık Detay sayfasına gidiyor */}
+                <Link href={`/clubs/${club.id}`} className="w-full block">
+                    <Button
+                        variant="outline"
+                        className="w-full text-xs h-9"
+                    >
+                        <ExternalLink className="w-3 h-3 mr-2" />
+                        Detaylar
+                    </Button>
+                </Link>
             </div>
         </div>
     );
