@@ -14,4 +14,6 @@ public interface IActivityService {
     List<DtoActivity> getActivitiesByClubId(Integer clubId);
 
     DtoActivity getActivityById(Integer id);
+
+    List<DtoActivity> getUpcomingActivities();
 }

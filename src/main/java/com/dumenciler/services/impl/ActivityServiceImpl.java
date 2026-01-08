@@ -70,4 +70,13 @@ public class ActivityServiceImpl implements IActivityService {
 
         return dto;
     }
+
+    @Override
+    public List<DtoActivity> getUpcomingActivities() {
+        return activityRepository
+                .findByActivityDateAfterAndIsActiveTrueOrderByActivityDateAsc(java.time.LocalDateTime.now())
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
 }

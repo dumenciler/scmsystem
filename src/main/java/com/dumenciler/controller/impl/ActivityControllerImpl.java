@@ -59,6 +59,11 @@ public class ActivityControllerImpl {
         return activityService.getActivityById(id);
     }
 
+    @GetMapping("/upcoming")
+    public List<DtoActivity> getUpcomingActivities() {
+        return activityService.getUpcomingActivities();
+    }
+
     // Apply
     @PostMapping("/apply")
     public DtoActivityApplication applyToActivity(@RequestParam Integer userId, @RequestParam Integer activityId) {

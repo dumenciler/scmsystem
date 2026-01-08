@@ -38,14 +38,19 @@ export default function ActivityDetailsPage() {
 
             if (act && currentUserId) {
                 // Check club membership
-                // Since we don't have a direct "check if member" easily accessible without list or passing clubId to a new endpoint...
-                // We can use getClubRegistrationsByUserId
-                const resRegs = await fetch(`http://localhost:8082/rest/api/club-registration/my-registrations/${currentUserId}`);
-                if (resRegs.ok) {
-                    const regs = await resRegs.json();
-                    const myRg = regs.find(r => r.club.id === act.club.id);
-                    if (myRg) {
-                        setRegistrationStatus(myRg.status);
+                // Check club membership (Logic from clubs/[id] page)
+                if (act.club?.id) {
+                    console.log("Checking registrations for club:", act.club.id);
+                    const resRegs = await fetch(`http://localhost:8082/rest/api/club-registration/list/${act.club.id}`);
+                    if (resRegs.ok) {
+                        const regs = await resRegs.json();
+                        console.log("Club registrations:", regs);
+                        // Find logic from club page: r.userId === currentUserId
+                        const myRg = regs.find((r: any) => r.userId == currentUserId);
+                        console.log("Matching registration:", myRg);
+                        if (myRg) {
+                            setRegistrationStatus(myRg.status);
+                        }
                     }
                 }
 
@@ -114,7 +119,7 @@ export default function ActivityDetailsPage() {
                         <Button
                             size="lg"
                             onClick={handleApply}
-                            disabled={!isMember || applying || !activity.isActive}
+                            disabled={!isMember || applying || !activity.active}
                             className={!isMember ? "opacity-50 cursor-not-allowed" : ""}
                         >
                             {applying ? <><Loader2 className="animate-spin mr-2" /> İşleniyor...</> :

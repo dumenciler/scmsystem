@@ -4,14 +4,16 @@ import { useEffect, useState } from "react";
 // import { useRouter } from "next/navigation"; // Önizleme ortamında hata verdiği için kapatıldı
 import { Button } from "@/components/ui/button";
 import { School, UserCircle, LogOut } from "lucide-react";
-import { getAllClubs } from "../actions";
+import { getAllClubs, getUpcomingActivities } from "../actions";
 import { ClubCard } from "@/components/ClubCard";
+import { EventCard } from "@/components/EventCard";
 
 export default function HomePage() {
   // const router = useRouter(); // Next.js yönlendiricisi yerine window.location kullanılacak
   const [userName, setUserName] = useState("");
   const [mounted, setMounted] = useState(false);
   const [clubs, setClubs] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,15 +22,23 @@ export default function HomePage() {
     if (storedName) {
       setUserName(storedName);
     }
-    fetchClubs();
+    fetchData();
   }, []);
 
-  const fetchClubs = async () => {
-    const result = await getAllClubs();
-    if (result.success) {
-      setClubs(result.data);
+  const fetchData = async () => {
+    try {
+      const [clubsResult, activitiesResult] = await Promise.all([
+        getAllClubs(),
+        getUpcomingActivities()
+      ]);
+
+      if (clubsResult.success) setClubs(clubsResult.data);
+      if (activitiesResult.success) setActivities(activitiesResult.data);
+    } catch (error) {
+      console.error("Veri yüklenirken hata:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleLogout = () => {
@@ -90,6 +100,8 @@ export default function HomePage() {
 
       <div className="flex-1 p-6 max-w-7xl mx-auto w-full space-y-8">
 
+
+
         {/* Intro Section */}
         <section className="text-center py-8 space-y-4">
           <h2 className="text-3xl font-bold text-zinc-900 dark:text-white">Kulüpleri Keşfet</h2>
@@ -111,6 +123,27 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {clubs.map(club => (
                 <ClubCard key={club.id} club={club} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Upcoming Events Section */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Yaklaşan Etkinlikler</h2>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-10 text-zinc-400">Etkinlikler yükleniyor...</div>
+          ) : activities.length === 0 ? (
+            <div className="text-center py-8 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
+              <p className="text-zinc-500">Şu an planlanmış bir etkinlik bulunmuyor.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {activities.map(activity => (
+                <EventCard key={activity.id} activity={activity} />
               ))}
             </div>
           )}

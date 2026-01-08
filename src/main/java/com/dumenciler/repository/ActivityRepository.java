@@ -15,4 +15,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Integer> {
 
     // Find all activities, sorted by date descending
     List<Activity> findAllByOrderByActivityDateDesc();
+
+    // Find upcoming active activities sorted by date ascending
+    List<Activity> findByActivityDateAfterAndIsActiveTrueOrderByActivityDateAsc(java.time.LocalDateTime date);
 }

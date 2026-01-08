@@ -197,6 +197,19 @@ export async function getActivityById(id) {
   }
 }
 
+export async function getUpcomingActivities() {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/activity/upcoming`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(() => ([]));
+    return { success: res.ok, data: Array.isArray(data) ? data : [] };
+  } catch {
+    return { success: false, data: [] };
+  }
+}
+
 export async function applyToActivity(userId, activityId) {
   try {
     const res = await fetch(`${API_BASE}/rest/api/activity/apply?userId=${userId}&activityId=${activityId}`, {
