@@ -137,3 +137,91 @@ export async function updateUser(id, userData) {
     return { success: false, message: "Sunucu hatası." };
   }
 }
+
+// --- ACTIVITY SERVICES ---
+
+export async function createActivity(activityData) {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/activity/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(activityData),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.id) {
+      return { success: true, message: "Etkinlik başarıyla oluşturuldu.", data };
+    }
+    return { success: false, message: "Etkinlik oluşturulamadı." };
+  } catch {
+    return { success: false, message: "Sunucu hatası." };
+  }
+}
+
+export async function getAllActivities() {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/activity/list`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(() => ([]));
+    return { success: res.ok, data: Array.isArray(data) ? data : [] };
+  } catch {
+    return { success: false, data: [] };
+  }
+}
+
+export async function getActivitiesByClub(clubId) {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/activity/list/${clubId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(() => ([]));
+    return { success: res.ok, data: Array.isArray(data) ? data : [] };
+  } catch {
+    return { success: false, data: [] };
+  }
+}
+
+export async function getActivityById(id) {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/activity/${id}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+export async function applyToActivity(userId, activityId) {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/activity/apply?userId=${userId}&activityId=${activityId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.id) {
+      return { success: true, message: "Başvuru başarılı.", data };
+    }
+    return { success: false, message: data.message || "Başvuru başarısız." };
+  } catch {
+    return { success: false, message: "Sunucu hatası." };
+  }
+}
+
+export async function getClubRegistrationsByUserId(userId) {
+  try {
+    const res = await fetch(`${API_BASE}/rest/api/club-registration/my-registrations/${userId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(() => ([]));
+    return { success: res.ok, data: Array.isArray(data) ? data : [] };
+  } catch {
+    return { success: false, data: [] };
+  }
+}

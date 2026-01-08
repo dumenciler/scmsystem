@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; // HATA BURADAYDI: Bu satır eksikti
-import { Users, PlusCircle, LayoutDashboard, ShieldCheck } from "lucide-react";
+import { Users, PlusCircle, LayoutDashboard, ShieldCheck, CalendarPlus } from "lucide-react";
 import { getAllClubs } from "../actions";
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +22,7 @@ export default function AdminDashboardPage() {
         try {
             const user = JSON.parse(userStr);
             if (user.role !== 'ADMIN') {
-                router.push("/login"); 
+                router.push("/login");
             }
         } catch (e) {
             router.push("/login");
@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {clubs.map(club => (
                                 <div key={club.id} className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
-                                    
+
                                     {/* Kulüp Bilgisi */}
                                     <div className="flex items-center gap-4 mb-4">
                                         <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-xl overflow-hidden shrink-0">
@@ -98,7 +98,15 @@ export default function AdminDashboardPage() {
 
                                     {/* Buton Kısmı */}
                                     <div className="mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-2">
-                                        {/* 1. Buton: Başvurular */}
+                                        {/* 1. Buton: Etkinlik Oluştur */}
+                                        <Link href={`/admin/create-activity/${club.id}`} className="w-full">
+                                            <Button variant="outline" className="w-full h-9 text-xs border-orange-200 text-orange-700 hover:bg-orange-50 hover:text-orange-800">
+                                                <CalendarPlus className="w-3 h-3 mr-2" />
+                                                Etkinlik Oluştur
+                                            </Button>
+                                        </Link>
+
+                                        {/* 2. Buton: Başvurular */}
                                         <Link href={`/admin/applications/${club.id}`} className="w-full">
                                             <Button className="w-full bg-blue-900 hover:bg-blue-800 text-white h-9 text-xs">
                                                 <Users className="w-3 h-3 mr-2" />
@@ -106,11 +114,19 @@ export default function AdminDashboardPage() {
                                             </Button>
                                         </Link>
 
-                                        {/* 2. Buton: Üyeler */}
+                                        {/* 3. Buton: Üyeler */}
                                         <Link href={`/admin/members/${club.id}`} className="w-full">
                                             <Button variant="outline" className="w-full h-9 text-xs border-blue-200 text-blue-700 hover:bg-blue-50">
                                                 <ShieldCheck className="w-3 h-3 mr-2" />
                                                 Üyeleri Görüntüle
+                                            </Button>
+                                        </Link>
+
+                                        {/* 4. Buton: Etkinlik Başvuruları */}
+                                        <Link href={`/admin/activity-applications/${club.id}`} className="w-full">
+                                            <Button variant="outline" className="w-full h-9 text-xs border-purple-200 text-purple-700 hover:bg-purple-50">
+                                                <CalendarPlus className="w-3 h-3 mr-2" />
+                                                Etkinlik Başvuruları
                                             </Button>
                                         </Link>
                                     </div>
@@ -120,6 +136,6 @@ export default function AdminDashboardPage() {
                     )}
                 </div>
             </div>
-        </main>
+        </main >
     );
 }
